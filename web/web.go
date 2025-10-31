@@ -289,6 +289,12 @@ func (s *Server) startTask() {
 	// Check whether xray is running every second
 	s.cron.AddJob("@every 1s", job.NewCheckXrayRunningJob())
 
+	//check ssh login success information every 5 seconds
+	s.cron.AddFunc("@every 5s", func() { job.NewCheckSSHLoginJob().CheckSSHLoginSuccess(startTime) })
+
+	//Check ssh login failed information every 60 seconds
+	s.cron.AddFunc("@every 60s", func() { job.NewCheckSSHLoginJob().CheckSSHLoginFailed() })
+
 	// Check if xray needs to be restarted every 30 seconds
 	s.cron.AddFunc("@every 30s", func() {
 		if s.xrayService.IsNeedRestartAndSetFalse() {
